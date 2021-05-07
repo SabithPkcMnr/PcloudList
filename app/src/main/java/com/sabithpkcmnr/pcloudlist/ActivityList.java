@@ -55,7 +55,7 @@ public class ActivityList extends AppCompatActivity {
         };
 
         serverViewModel.getListData().observe(this, serverObserver);
-        ActivityUtils.requestServerForData(this, ActivityUtils.PUBLIC_STORAGE_URL + extraUrlData);
+        ActivityUtils.requestServerForData(ActivityUtils.PUBLIC_STORAGE_URL + extraUrlData);
 
     }
 }

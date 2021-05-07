@@ -45,6 +45,7 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> 
 
         if (stringFileSize != null && stringFileSize.length()>2){
             holder.itemSize.setText(ActivityUtils.getFileSize(stringFileSize));
+            holder.itemSize.setVisibility(View.VISIBLE);
         }
         Glide.with(context)
                 .load("https://pcdn-filedn.pcloud.com/img/icons/16/" + modelFile.get(position).getIcon() + ".png")
