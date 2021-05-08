@@ -1,2 +1,2 @@
-rootProject.name = "PcloudList"
+rootProject.name = "Pcloud List"
 include ':app'

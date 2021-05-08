@@ -1,10 +1,11 @@
-package com.sabithpkcmnr.pcloudlist;
+package com.sabithpkcmnr.pcloudlist.extra;
 
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.sabithpkcmnr.pcloudlist.BuildConfig;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -12,6 +13,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.sabithpkcmnr.pcloudlist.ActivityList;
+import com.sabithpkcmnr.pcloudlist.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +25,7 @@ import java.util.ArrayList;
 
 public class ActivityUtils {
 
-    //Add your Pcloud public link without last splash.
+    //Add your Pcloud public URL without last splash.
     //You can change the URL from the app level build.gradle file
     public static String PUBLIC_STORAGE_URL = BuildConfig.PCLOUD;
 
@@ -47,8 +50,8 @@ public class ActivityUtils {
                     public void onResponse(String response) {
                         try {
                             String filterA = response.trim().split(RESPONSE_FILTER)[1];
-                            String filterD = filterA.substring(filterA.lastIndexOf("\"content\": [") + 1);
-                            String finalResponse = "{\n\"" + filterD.split(RESPONSE_FILTER_END)[0] + "\n]\n}".trim();
+                            String filterB = filterA.substring(filterA.lastIndexOf("\"content\": [") + 1);
+                            String finalResponse = "{\n\"" + filterB.split(RESPONSE_FILTER_END)[0] + "\n]\n}".trim();
 
                             try {
                                 splitJsonDataToList(finalResponse);
@@ -78,7 +81,7 @@ public class ActivityUtils {
         JSONArray contentData = reader.getJSONArray("content");
 
         if (contentData.length() > 0) {
-            ArrayList<ModelFile> modelFile = new ArrayList<>();
+            ArrayList<ModelList> modelList = new ArrayList<>();
             for (int a = 0; a < contentData.length(); a++) {
                 JSONObject singleItem = contentData.getJSONObject(a);
                 String itemSize = "";
@@ -89,9 +92,9 @@ public class ActivityUtils {
                 String itemName = singleItem.getString("name");
                 String itemModified = singleItem.getString("modified");
                 String itemIcon = singleItem.getString("icon");
-                modelFile.add(new ModelFile(itemName, itemSize, itemModified, itemIcon));
+                modelList.add(new ModelList(itemName, itemSize, itemModified, itemIcon));
             }
-            new ViewModelProvider(myActivity).get(ServerViewModel.class).getListData().setValue(modelFile);
+            new ViewModelProvider(myActivity).get(ListDetector.class).getListData().setValue(modelList);
             myDialog.dismiss();
 
         } else {

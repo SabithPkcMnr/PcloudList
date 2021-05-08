@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.sabithpkcmnr.pcloudlist.extra.ActivityUtils;
+import com.sabithpkcmnr.pcloudlist.extra.ModelList;
 
 import java.util.ArrayList;
 
 public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> {
 
     Context context;
-    String extraUrlData;
-    ArrayList<ModelFile> modelFile;
+    String passedUrlData;
+    ArrayList<ModelList> modelList;
 
-    public AdapterList(Context context, ArrayList<ModelFile> modelFile, String extraUrlData) {
-        this.extraUrlData = extraUrlData;
-        this.modelFile = modelFile;
+    public AdapterList(Context context, ArrayList<ModelList> modelList, String passedUrlData) {
+        this.passedUrlData = passedUrlData;
+        this.modelList = modelList;
         this.context = context;
     }
 
@@ -39,16 +40,16 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull AdapterList.MyViewHolder holder, int position) {
-        holder.itemName.setText(modelFile.get(position).getName());
-        holder.itemDate.setText(modelFile.get(position).getDate().replace("+0000",""));
-        String stringFileSize = modelFile.get(position).getSize();
+        holder.itemName.setText(modelList.get(position).getName());
+        holder.itemDate.setText(modelList.get(position).getDate().replace("+0000",""));
+        String stringFileSize = modelList.get(position).getSize();
 
         if (stringFileSize != null && stringFileSize.length()>2){
             holder.itemSize.setText(ActivityUtils.getFileSize(stringFileSize));
             holder.itemSize.setVisibility(View.VISIBLE);
         }
         Glide.with(context)
-                .load("https://pcdn-filedn.pcloud.com/img/icons/16/" + modelFile.get(position).getIcon() + ".png")
+                .load("https://pcdn-filedn.pcloud.com/img/icons/16/" + modelList.get(position).getIcon() + ".png")
                 .into(holder.itemIcon);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -56,13 +57,11 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> 
             public void onClick(View v) {
 
                 boolean isFile;
-                String urlToPass;
-                String stringFileExtension;
-                String stringName = modelFile.get(position).getName();
-                String extraTitleData = extraUrlData + " > " + modelFile.get(position).getName();
+                String stringName = modelList.get(position).getName();
+                String extraTitleData = passedUrlData + "/" + modelList.get(position).getName();
 
                 try{
-                    stringFileExtension = stringName.substring(stringName.lastIndexOf("."));
+                    stringName.substring(stringName.lastIndexOf("."));
                     isFile = true;
                 } catch (StringIndexOutOfBoundsException ignored){
                     isFile = false;
@@ -78,11 +77,11 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String webUrl;
-                            if (extraUrlData != null && extraUrlData.length()>0){
-                                webUrl = extraUrlData + "/" + modelFile.get(position).getName();
+                            if (passedUrlData != null && passedUrlData.length()>0){
+                                webUrl = passedUrlData + "/" + modelList.get(position).getName();
 
                             } else {
-                                webUrl = "/" + modelFile.get(position).getName();
+                                webUrl = "/" + modelList.get(position).getName();
                             }
                             context.startActivity(new Intent(Intent.ACTION_VIEW,
                                     Uri.parse(ActivityUtils.PUBLIC_STORAGE_URL + webUrl)));
@@ -94,14 +93,7 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> 
 
 
                 } else {
-                    if (extraUrlData != null && extraUrlData.length()>0){
-                        urlToPass = extraUrlData + "/" + modelFile.get(position).getName();
-
-                    } else {
-                        urlToPass = "/" + modelFile.get(position).getName();
-                    }
                     context.startActivity(new Intent(context, ActivityList.class)
-                            .putExtra("extraUrlData", urlToPass)
                             .putExtra("extraTitleData",extraTitleData));
                 }
 
@@ -111,7 +103,7 @@ public class AdapterList extends RecyclerView.Adapter<AdapterList.MyViewHolder> 
 
     @Override
     public int getItemCount() {
-        return modelFile.size();
+        return modelList.size();
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {

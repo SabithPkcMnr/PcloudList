@@ -1,15 +1,15 @@
-package com.sabithpkcmnr.pcloudlist;
+package com.sabithpkcmnr.pcloudlist.extra;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 
-public class ServerViewModel extends ViewModel {
+public class ListDetector extends ViewModel {
 
-    MutableLiveData<ArrayList<ModelFile>> listData;
+    MutableLiveData<ArrayList<ModelList>> listData;
 
-    public MutableLiveData<ArrayList<ModelFile>> getListData() {
+    public MutableLiveData<ArrayList<ModelList>> getListData() {
         if (listData == null){
             listData = new MutableLiveData<>();
         }

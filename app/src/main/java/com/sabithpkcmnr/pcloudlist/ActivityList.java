@@ -1,51 +1,56 @@
 package com.sabithpkcmnr.pcloudlist;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MenuItem;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.sabithpkcmnr.pcloudlist.extra.ActivityUtils;
+import com.sabithpkcmnr.pcloudlist.extra.ListDetector;
+import com.sabithpkcmnr.pcloudlist.extra.ModelList;
+
 import java.util.ArrayList;
 
 public class ActivityList extends AppCompatActivity {
 
+    TextView txFolders;
     RecyclerView rvList;
+    String extraTitleData;
     AdapterList adapterList;
-    ServerViewModel serverViewModel;
-    String extraUrlData, extraTitleData;
+    ListDetector myListDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         ActivityUtils.myActivity = this;
         rvList = findViewById(R.id.rvList);
-        extraUrlData = getIntent().getStringExtra("extraUrlData");
+        txFolders = findViewById(R.id.txFolders);
         extraTitleData = getIntent().getStringExtra("extraTitleData");
-
-        if (extraUrlData == null) {
-            extraUrlData = "";
-        }
 
         if (extraTitleData == null) {
             extraTitleData = "";
-            setTitle("Home");
+            txFolders.setText("Home");
         } else {
-            setTitle("Home" + extraTitleData);
+            setTitle(extraTitleData.substring(extraTitleData.lastIndexOf("/"))
+                    .replace("/",""));
+            txFolders.setText("Home" + extraTitleData.replaceAll("/", " > "));
         }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(extraTitleData != null && extraTitleData.length() > 0);
 
-        serverViewModel = new ViewModelProvider(this).get(ServerViewModel.class);
-        Observer<ArrayList<ModelFile>> serverObserver = new Observer<ArrayList<ModelFile>>() {
+        myListDetector = new ViewModelProvider(this).get(ListDetector.class);
+        Observer<ArrayList<ModelList>> serverObserver = new Observer<ArrayList<ModelList>>() {
             @Override
-            public void onChanged(ArrayList<ModelFile> modelFiles) {
-                //modelFile = modelFiles;
-                if (modelFiles != null && modelFiles.size() > 0) {
-                    adapterList = new AdapterList(ActivityList.this, modelFiles, extraUrlData);
+            public void onChanged(ArrayList<ModelList> modelList) {
+                if (modelList != null && modelList.size() > 0) {
+                    adapterList = new AdapterList(ActivityList.this, modelList, extraTitleData);
                     rvList.setLayoutManager(new LinearLayoutManager(ActivityList.this));
                     rvList.setHasFixedSize(true);
                     rvList.setNestedScrollingEnabled(false);
@@ -54,8 +59,15 @@ public class ActivityList extends AppCompatActivity {
             }
         };
 
-        serverViewModel.getListData().observe(this, serverObserver);
-        ActivityUtils.requestServerForData(ActivityUtils.PUBLIC_STORAGE_URL + extraUrlData);
+        myListDetector.getListData().observe(this, serverObserver);
+        ActivityUtils.requestServerForData(ActivityUtils.PUBLIC_STORAGE_URL + extraTitleData);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
